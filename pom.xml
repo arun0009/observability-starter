@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
          http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.company</groupId>
+    <groupId>io.github.arun0009</groupId>
     <artifactId>observability-starter</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>

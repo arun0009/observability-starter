@@ -6,7 +6,7 @@ A Spring Boot starter that gives your microservices enterprise-grade observabili
 
 ```xml
 <dependency>
-    <groupId>com.company</groupId>
+    <groupId>io.github.arun0009</groupId>
     <artifactId>observability-starter</artifactId>
     <version>1.0.0</version>
 </dependency>
