@@ -1,0 +1,102 @@
+{
+  "groups": [
+    {
+      "name": "observability",
+      "type": "com.company.observability.autoconfigure.ObservabilityProperties",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties"
+    },
+    {
+      "name": "observability.async",
+      "type": "com.company.observability.autoconfigure.ObservabilityProperties$Async",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties",
+      "sourceMethod": "getAsync()"
+    },
+    {
+      "name": "observability.audit",
+      "type": "com.company.observability.autoconfigure.ObservabilityProperties$Audit",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties",
+      "sourceMethod": "getAudit()"
+    },
+    {
+      "name": "observability.exception-handler",
+      "type": "com.company.observability.autoconfigure.ObservabilityProperties$ExceptionHandler",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties",
+      "sourceMethod": "getExceptionHandler()"
+    },
+    {
+      "name": "observability.kafka",
+      "type": "com.company.observability.autoconfigure.ObservabilityProperties$Kafka",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties",
+      "sourceMethod": "getKafka()"
+    },
+    {
+      "name": "observability.mdc",
+      "type": "com.company.observability.autoconfigure.ObservabilityProperties$Mdc",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties",
+      "sourceMethod": "getMdc()"
+    },
+    {
+      "name": "observability.sampling",
+      "type": "com.company.observability.autoconfigure.ObservabilityProperties$Sampling",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties",
+      "sourceMethod": "getSampling()"
+    },
+    {
+      "name": "observability.trace-guard",
+      "type": "com.company.observability.autoconfigure.ObservabilityProperties$TraceGuard",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties",
+      "sourceMethod": "getTraceGuard()"
+    }
+  ],
+  "properties": [
+    {
+      "name": "observability.async.propagation-enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties$Async",
+      "defaultValue": true
+    },
+    {
+      "name": "observability.audit.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties$Audit",
+      "defaultValue": true
+    },
+    {
+      "name": "observability.exception-handler.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties$ExceptionHandler",
+      "defaultValue": true
+    },
+    {
+      "name": "observability.kafka.propagation-enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties$Kafka",
+      "defaultValue": true
+    },
+    {
+      "name": "observability.mdc.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties$Mdc",
+      "defaultValue": true
+    },
+    {
+      "name": "observability.sampling.probability",
+      "type": "java.lang.Double",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties$Sampling",
+      "defaultValue": 1
+    },
+    {
+      "name": "observability.trace-guard.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties$TraceGuard",
+      "defaultValue": true
+    },
+    {
+      "name": "observability.trace-guard.fail-on-missing",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.company.observability.autoconfigure.ObservabilityProperties$TraceGuard",
+      "defaultValue": false
+    }
+  ],
+  "hints": []
+}
