@@ -125,6 +125,13 @@
             </exclusions>
         </dependency>
 
+        <!-- OkHttp (Optional — for OkHttp instrumentation) -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Kafka (Optional — for Kafka interceptors) -->
         <dependency>
             <groupId>org.springframework.kafka</groupId>

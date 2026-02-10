@@ -10,12 +10,14 @@ import com.company.observability.metrics.SloMetricsConfiguration;
 import com.company.observability.metrics.StandardMetricsConfiguration;
 import com.company.observability.async.ObservabilityExecutorConfiguration;
 import com.company.observability.kafka.KafkaTracingConfiguration;
+import com.company.observability.propagation.OkHttpPropagationConfiguration;
 import com.company.observability.propagation.RestTemplatePropagationConfiguration;
 import com.company.observability.propagation.WebClientPropagationConfiguration;
 import com.company.observability.guardrails.ObservabilityGuardrailsConfiguration;
 import com.company.observability.scheduling.ScheduledTaskObservabilityAspect;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -25,16 +27,31 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
+import com.company.observability.logging.PiiMaskingConverter;
+import com.company.observability.metrics.GitInfoMetricsConfiguration;
+import com.company.observability.metrics.ThreadPoolSaturationMetrics;
+import com.company.observability.startup.ObservabilityStartupBanner;
+import org.springframework.boot.info.GitProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.List;
+import java.util.Map;
+import org.springframework.core.env.Environment;
 
 @AutoConfiguration
 @ConditionalOnWebApplication
 @EnableConfigurationProperties(ObservabilityProperties.class)
 @Import({
         StandardMetricsConfiguration.class,
+        BusinessMetrics.class,
+        AuditLogger.class,
+        ObservabilityExceptionHandler.class,
+        ScheduledTaskObservabilityAspect.class,
+        TraceGuardFilter.class,
         SloMetricsConfiguration.class,
         RestTemplatePropagationConfiguration.class,
         WebClientPropagationConfiguration.class,
+        OkHttpPropagationConfiguration.class,
         ObservabilityGuardrailsConfiguration.class,
         ObservabilityExecutorConfiguration.class,
         KafkaTracingConfiguration.class
@@ -46,11 +63,11 @@ public class ObservabilityAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnProperty(prefix = "observability.mdc", name = "enabled", havingValue = "true", matchIfMissing = true)
-    public MdcFilter mdcFilter(
+    public MdcFilter mdcFilter(ObservabilityProperties properties,
             @Value("${spring.application.name:unknown-service}") String serviceName,
             @Value("${app.env:unknown-env}") String environment,
-            ObjectProvider<List<MdcContributor>> contributors) {
-        return new MdcFilter(serviceName, environment, contributors.getIfAvailable());
+            List<MdcContributor> contributors) {
+        return new MdcFilter(serviceName, environment, contributors);
     }
 
     @Bean

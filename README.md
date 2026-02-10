@@ -98,6 +98,19 @@ webClientBuilder.build()
 // Same headers propagated automatically
 ```
 
+**OkHttp** — works automatically for all `OkHttpClient.Builder` beans:
+
+```java
+@Autowired OkHttpClient.Builder builder;
+OkHttpClient client = builder.build();
+
+Request request = new Request.Builder()
+    .url("http://downstream/api")
+    .build();
+client.newCall(request).execute();
+// Headers propagated automatically
+```
+
 **Kafka** — producer/consumer interceptors are auto-registered when `spring-kafka` is on the classpath:
 
 ```java
@@ -257,6 +270,52 @@ Detects incoming requests missing trace propagation headers (`traceparent`, `X-B
 - Logs a warning
 - Increments `trace.missing.total` counter
 - Optionally rejects the request (for strict environments)
+
+---
+
+### 10. PII Redaction
+
+Automatically masks sensitive data in logs using `PiiMaskingConverter`:
+- Emails: `user@example.com` → `[EMAIL]`
+- SSNs: `123-45-6789` → `[SSN]`
+- JSON Secrets: `"password": "secret"` → `"password": "***"`
+
+Enabled automatically in the JSON layout.
+
+---
+
+### 11. Git & System Metrics
+
+Extra high-value metrics out of the box:
+- `app.info`: Tags for `version`, `commit`, `branch` (correlate performance to deployments)
+- `thread.pool.saturation`: Monitors all `ThreadPoolTaskExecutor` beans for exhaustion
+
+**Requirement:** Consuming applications must include the `git-commit-id-maven-plugin` to generate the necessary `git.properties` file:
+
+```xml
+<plugin>
+    <groupId>io.github.git-commit-id</groupId>
+    <artifactId>git-commit-id-maven-plugin</artifactId>
+</plugin>
+```
+
+---
+
+### 12. Startup Banner
+
+Prints a beautiful summary of active observability features on startup:
+
+```
+========================================================================================
+   🚀 OBSERVABILITY ACTIVE   ::   ServiceName: order-service
+========================================================================================
+   Profile    : prod
+   Tracing    : [Sample Rate: 1.0] (Full)
+   Async Prop : ENABLED
+   TraceGuard : [Fail-Fast: false]
+   Logging    : [JSON + PiiMasking]
+========================================================================================
+```
 
 ---
 
