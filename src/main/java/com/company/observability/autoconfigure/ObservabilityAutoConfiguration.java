@@ -16,8 +16,7 @@ import com.company.observability.propagation.WebClientPropagationConfiguration;
 import com.company.observability.guardrails.ObservabilityGuardrailsConfiguration;
 import com.company.observability.scheduling.ScheduledTaskObservabilityAspect;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -43,10 +42,6 @@ import org.springframework.core.env.Environment;
 @EnableConfigurationProperties(ObservabilityProperties.class)
 @Import({
         StandardMetricsConfiguration.class,
-        BusinessMetrics.class,
-        AuditLogger.class,
-        ObservabilityExceptionHandler.class,
-        ScheduledTaskObservabilityAspect.class,
         TraceGuardFilter.class,
         SloMetricsConfiguration.class,
         RestTemplatePropagationConfiguration.class,
@@ -114,5 +109,27 @@ public class ObservabilityAutoConfiguration {
             @Value("${spring.application.name:unknown-service}") String serviceName,
             @Value("${app.env:unknown-env}") String environment) {
         return new ScheduledTaskObservabilityAspect(meterRegistry, serviceName, environment);
+    }
+
+    // ── Extras / WOW Features ────────────────────────────────
+
+    @Bean
+    @ConditionalOnBean(GitProperties.class)
+    public GitInfoMetricsConfiguration gitInfoMetricsConfiguration(MeterRegistry registry,
+            GitProperties gitProperties) {
+        return new GitInfoMetricsConfiguration(registry, gitProperties);
+    }
+
+    @Bean
+    public ThreadPoolSaturationMetrics threadPoolSaturationMetrics(MeterRegistry registry,
+            Map<String, ThreadPoolTaskExecutor> executors) {
+        return new ThreadPoolSaturationMetrics(registry, executors);
+    }
+
+    @Bean
+    public ObservabilityStartupBanner observabilityStartupBanner(ObservabilityProperties properties,
+            Environment env,
+            @Value("${spring.application.name:unknown}") String serviceName) {
+        return new ObservabilityStartupBanner(properties, env, serviceName);
     }
 }

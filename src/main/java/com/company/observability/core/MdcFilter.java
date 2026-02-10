@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.MDC;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -40,19 +41,38 @@ public class MdcFilter implements Filter {
 
         if (request instanceof HttpServletRequest) {
             HttpServletRequest httpRequest = (HttpServletRequest) request;
+            HttpServletResponse httpResponse = (response instanceof jakarta.servlet.http.HttpServletResponse)
+                    ? (jakarta.servlet.http.HttpServletResponse) response
+                    : null;
+
             try {
                 // 1. Static / service-level context
                 MDC.put(MdcKeys.SERVICE_NAME, serviceName);
                 MDC.put(MdcKeys.ENVIRONMENT, environment);
 
                 // 2. Request-scoped identity
-                putHeaderOrGenerate(httpRequest, MdcKeys.HEADER_REQUEST_ID, MdcKeys.REQUEST_ID);
+                // Request ID
+                String requestId = httpRequest.getHeader(MdcKeys.HEADER_REQUEST_ID);
+                if (requestId == null || requestId.isEmpty()) {
+                    requestId = UUID.randomUUID().toString();
+                }
+                MDC.put(MdcKeys.REQUEST_ID, requestId);
+
+                // Response Injection: X-Request-ID
+                if (httpResponse != null) {
+                    httpResponse.setHeader(MdcKeys.HEADER_REQUEST_ID, requestId);
+                }
+
                 putHeaderIfPresent(httpRequest, MdcKeys.HEADER_USER_ID, MdcKeys.USER_ID);
                 putHeaderIfPresent(httpRequest, MdcKeys.HEADER_TENANT_ID, MdcKeys.TENANT_ID);
                 putHeaderIfPresent(httpRequest, MdcKeys.HEADER_CORRELATION_ID, MdcKeys.CORRELATION_ID);
 
-                // 3. TraceId / SpanId are populated by micrometer-tracing / OTel bridge.
-                // We do NOT set them manually to avoid conflicts.
+                // 3. Trace ID (Micrometer/OTel specific)
+                // Try to grab it if already populated by OTel filter upstream
+                String traceId = MDC.get(MdcKeys.TRACE_ID);
+                if (traceId != null && httpResponse != null) {
+                    httpResponse.setHeader("X-Trace-ID", traceId);
+                }
 
                 // 4. Custom extensions
                 for (MdcContributor contributor : contributors) {
@@ -66,11 +86,6 @@ public class MdcFilter implements Filter {
         } else {
             chain.doFilter(request, response);
         }
-    }
-
-    private void putHeaderOrGenerate(HttpServletRequest request, String headerName, String mdcKey) {
-        String value = request.getHeader(headerName);
-        MDC.put(mdcKey, (value != null && !value.isEmpty()) ? value : UUID.randomUUID().toString());
     }
 
     private void putHeaderIfPresent(HttpServletRequest request, String headerName, String mdcKey) {

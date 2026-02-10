@@ -317,6 +317,15 @@ Prints a beautiful summary of active observability features on startup:
 ========================================================================================
 ```
 
+### 13. Response Header Injection
+The library automatically injects observability context into HTTP response headers, allowing frontend applications and users to correlate errors with backend logs.
+
+*   `X-Request-ID`: The unique request ID (same as `requestId` in logs).
+*   `X-Trace-ID`: The distributed trace ID (if available).
+
+### 14. Service Identity Guardrail
+To ensure traces are identifiable, the library checks `spring.application.name` on startup. If it is set to a default value (e.g., `unknown`, `application`), a **warning banner** is displayed, prompting you to set a unique service name.
+
 ---
 
 ## Configuration
